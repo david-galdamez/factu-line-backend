@@ -1,1 +1,8 @@
-console.log("Inicializando")
+import app from "./app"
+
+const PORT = process.env.PORT || 8080
+
+app.listen(PORT, () => {
+	console.log(`Server listening on url: http://localhost:${PORT}`)
+})
+
