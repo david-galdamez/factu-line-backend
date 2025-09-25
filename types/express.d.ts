@@ -1,7 +1,7 @@
 import "express"
 
 export interface UserSession {
-	id: bigint
+	id: number
 }
 
 declare module "express" {

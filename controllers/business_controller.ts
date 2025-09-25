@@ -70,6 +70,7 @@ export class BusinessController {
 				data: null,
 				error: "Internal server error"
 			})
+			return
 		}
 	}
 
@@ -112,7 +113,7 @@ export class BusinessController {
 			}
 
 			const token = jwt.sign(
-				{ id: businessRow.id },
+				{ id: businessRow.id as number },
 				SECRET_JWT_KEY,
 				{
 					expiresIn: "1h"
@@ -128,7 +129,7 @@ export class BusinessController {
 				data: null,
 				message: "Login successfully"
 			})
-
+			return
 		} catch (error) {
 			console.log("Error login business: ", error)
 			res.status(500).json({
@@ -136,6 +137,7 @@ export class BusinessController {
 				data: null,
 				error: "Internal server error"
 			})
+			return
 		}
 	}
 
@@ -145,5 +147,6 @@ export class BusinessController {
 			data: null,
 			message: "Logout successfully"
 		})
+		return
 	}
 }
