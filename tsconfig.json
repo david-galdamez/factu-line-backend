@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "types": ["node", "express"],
+    "typeRoots": ["./node_modules/@types", "./types"],
+    "module": "ESNext",
+    "esModuleInterop": true,
+    "moduleResolution": "Node",
+    "allowSyntheticDefaultImports": true,
+    "allowImportingTsExtensions": true
+  },
+}
