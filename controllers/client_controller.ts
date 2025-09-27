@@ -28,11 +28,11 @@ export class ClientController {
 				...result.data
 			}
 
-			const client = await this.clientModel.getClientByEmail({
+			const clientRows = await this.clientModel.getClientByEmail({
 				business_id: businessId,
 				clientEmail: result.data.email
 			})
-			if (client.length !== 0) {
+			if (clientRows.length !== 0) {
 				res.status(409).json({
 					success: false,
 					data: null,
@@ -41,8 +41,8 @@ export class ClientController {
 				return
 			}
 
-			const createdClient = await this.clientModel.create(businessId, newClient)
-			if (!createdClient) {
+			const createdClientId = await this.clientModel.create(businessId, newClient)
+			if (!createdClientId) {
 				res.status(500).json({
 					success: false,
 					data: null,
@@ -53,7 +53,7 @@ export class ClientController {
 
 			res.status(201).json({
 				success: true,
-				data: { client_id: Number(createdClient) },
+				data: { client_id: createdClientId ? Number(createdClientId.valueOf()) : null },
 				message: "Client created successfully"
 			})
 			return
@@ -71,12 +71,11 @@ export class ClientController {
 	getClients = async (req: Request, res: Response) => {
 		try {
 			const businessId = req.session.user.id
-			const clientsResult = await this.clientModel.getClients({ id: businessId })
-
+			const clientsRows = await this.clientModel.getClients({ id: businessId })
 			res.status(200).json({
 				success: true,
 				data: {
-					clients: clientsResult
+					clients: clientsRows
 				},
 				message: "Found business clients"
 			})
