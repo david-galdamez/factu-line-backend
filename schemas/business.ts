@@ -11,6 +11,9 @@ export const BusinessRequest = z.object({
 		.regex(/^[\w\s.,-]+$/, "Address contains invalid characters"),
 	phone: z.string()
 		.regex(/^\d{8,15}$/, "Phone must contain 8 to 15 digits"),
+	user_name: z.string()
+		.min(2, "Name must have at least 2 characters")
+		.regex(/^[a-zA-Z\s]+$/, "Name can only contain letters and spaces"),
 	email: z.email("Invalid email format"),
 	password: z.string()
 		.min(8, "Password must be at least 8 characters long")

@@ -1,7 +1,9 @@
 import "express"
 
 export interface UserSession {
-	id: number
+	id: number,
+	business_id: number,
+	role_id: number
 }
 
 declare module "express" {

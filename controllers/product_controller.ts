@@ -23,7 +23,7 @@ export class ProductController {
 				return
 			}
 
-			const businessId = req.session.user.id
+			const businessId = req.session.user.business_id
 			const newProduct: NewProductType = {
 				...result.data
 			}
@@ -109,7 +109,7 @@ export class ProductController {
 
 	getProducts = async (req: Request, res: Response) => {
 		try {
-			const businessId = req.session.user.id
+			const businessId = req.session.user.business_id
 
 			const productsRows = await this.productModel.getProducts({ businessId })
 

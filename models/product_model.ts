@@ -12,8 +12,8 @@ export class ProductModel {
 	create = async ({ businessId, newProduct }: { businessId: number, newProduct: NewProductType }): Promise<bigint | null> => {
 		try {
 			const result = await this.db.execute({
-				sql: `INSERT INTO products (business_id, name, description, unit_price, stock)
-					VALUES(:business_id, :name, :description, :unit_price, :stock)`,
+				sql: `INSERT INTO products (business_id, name, description, unit_price)
+					VALUES(:business_id, :name, :description, :unit_price)`,
 				args: {
 					business_id: businessId,
 					...newProduct

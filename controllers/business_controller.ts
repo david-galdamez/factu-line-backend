@@ -32,8 +32,8 @@ export class BusinessController {
 				return
 			}
 
-			const business = await this.businessModel.getBusinessByEmail({ email: result.data.email })
-			if (business.rows.length > 0) {
+			const user = await this.businessModel.getUserByEmail({ email: result.data.email })
+			if (user.rows.length > 0) {
 				res.status(409).json({
 					success: false,
 					error: "Email is already being used",
@@ -46,19 +46,11 @@ export class BusinessController {
 			const newBusiness: NewBusinessType = { ...result.data, password: hashedPassword }
 
 			const createdBusiness = await this.businessModel.create(newBusiness)
-			if (!createdBusiness.lastInsertRowid) {
-				res.status(500).json({
-					success: false,
-					data: null,
-					error: "Error registering business"
-				})
-				return
-			}
 
 			res.status(201).json({
 				success: true,
 				data: {
-					id: createdBusiness.lastInsertRowid
+					id: createdBusiness
 				},
 				message: "Business registered successfully"
 			})
@@ -89,8 +81,8 @@ export class BusinessController {
 				return
 			}
 
-			const business = await this.businessModel.getBusinessByEmail({ email: loginResult.data.email })
-			if (business.rows.length === 0) {
+			const user = await this.businessModel.getUserByEmail({ email: loginResult.data.email })
+			if (user.rows.length === 0) {
 				res.status(404).json({
 					success: false,
 					data: null,
@@ -99,9 +91,9 @@ export class BusinessController {
 				return
 			}
 
-			const businessRow = business.rows[0]
+			const userRow = user.rows[0]
 
-			const hashedPassword = String(businessRow.password)
+			const hashedPassword = String(userRow.password)
 			const isPassword = await bcrypt.compare(loginResult.data.password, hashedPassword)
 			if (!isPassword) {
 				res.status(401).json({
@@ -113,7 +105,11 @@ export class BusinessController {
 			}
 
 			const token = jwt.sign(
-				{ id: businessRow.id as number },
+				{
+					id: userRow.id as number,
+					business_id: userRow.business_id as number,
+					role_id: userRow.role_id as number
+				},
 				SECRET_JWT_KEY,
 				{
 					expiresIn: "1h"

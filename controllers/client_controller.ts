@@ -23,7 +23,7 @@ export class ClientController {
 				return
 			}
 
-			const businessId = req.session.user.id
+			const businessId = req.session.user.business_id
 			const newClient: NewClientType = {
 				...result.data
 			}
@@ -70,7 +70,7 @@ export class ClientController {
 
 	getClients = async (req: Request, res: Response) => {
 		try {
-			const businessId = req.session.user.id
+			const businessId = req.session.user.business_id
 			const clientsRows = await this.clientModel.getClients({ id: businessId })
 			res.status(200).json({
 				success: true,
