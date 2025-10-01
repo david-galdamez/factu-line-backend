@@ -60,7 +60,7 @@ export class InvoiceModel {
 
 	getPrice = async (transaction: Transaction, productId: number) => {
 		const price = await transaction.execute({
-			sql: "SELECT price FROM products WHERE id = ?",
+			sql: "SELECT unit_price FROM products WHERE id = ?",
 			args: [productId]
 		})
 
@@ -68,7 +68,7 @@ export class InvoiceModel {
 			throw new Error(`Product ${productId}, not found`)
 		}
 
-		return price.rows[0].price as number
+		return price.rows[0].unit_price as number
 	}
 
 	generateInvoiceNumber = async (transaction: Transaction, businessId: number): Promise<string | null> => {

@@ -33,7 +33,7 @@ export class BusinessModel {
 		try {
 			const createdBusiness = await transaction.execute({
 				sql: `INSERT INTO businesses(name, tax_id, address, phone)
-				VALUES (:name, :tax_id, :address, :phone,)`,
+				VALUES (:name, :tax_id, :address, :phone)`,
 				args: {
 					name: newBusiness.name,
 					tax_id: newBusiness.tax_id,

@@ -7,3 +7,5 @@ export const invoiceRouter = Router()
 
 const invoiceModel = new InvoiceModel(db)
 const invoiceController = new InvoiceController(invoiceModel)
+
+invoiceRouter.post("/create", invoiceController.create)

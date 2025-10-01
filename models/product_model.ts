@@ -30,7 +30,7 @@ export class ProductModel {
 	update = async ({ productId, newProduct }: { productId: number, newProduct: NewProductType }): Promise<number | null> => {
 		try {
 			const result = await this.db.execute({
-				sql: `UPDATE products SET name = :name, description = :description, unit_price = :unit_price, stock= :stock WHERE id = :product_id`,
+				sql: `UPDATE products SET name = :name, description = :description, unit_price = :unit_price WHERE id = :product_id`,
 				args: {
 					...newProduct,
 					product_id: productId
@@ -61,7 +61,7 @@ export class ProductModel {
 	getProducts = async ({ businessId }: { businessId: number }): Promise<Row[] | null> => {
 		try {
 			const result = await this.db.execute({
-				sql: "SELECT id, name, description, unit_price, stock FROM products WHERE business_id = :business_id",
+				sql: "SELECT id, name, description, unit_price FROM products WHERE business_id = :business_id",
 				args: { business_id: businessId }
 			})
 
