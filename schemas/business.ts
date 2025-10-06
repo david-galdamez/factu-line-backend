@@ -28,3 +28,15 @@ export const BusinessLogin = z.object({
 		.regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/,
 			"Password must contain uppercase, lowercase, number and special character"),
 })
+
+export const NewUserRequest = z.object({
+	name: z.string()
+		.min(2, "Name must have at least 2 characters")
+		.regex(/^[a-zA-Z\s]+$/, "Name can only contain letters and spaces"),
+	email: z.email("Invalid email format"),
+	password: z.string()
+		.min(8, "Password must be at least 8 characters long")
+		.regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/,
+			"Password must contain uppercase, lowercase, number and special character"),
+	role_id: z.number().positive().min(1, "Id can't be zero")
+})

@@ -35,6 +35,7 @@ export class InvoiceController {
 				data: createdInvoice,
 				message: "Invoice created succesfully"
 			})
+			return
 		} catch (error) {
 			console.error("Error creating invoice: ", error)
 			res.status(500).json({

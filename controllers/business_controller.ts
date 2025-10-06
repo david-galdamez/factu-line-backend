@@ -1,9 +1,9 @@
 import z from "zod"
-import { BusinessLogin, BusinessRequest } from "../schemas/business"
+import { BusinessLogin, BusinessRequest, NewUserRequest } from "../schemas/business"
 import { BusinessModel } from "../models/business_model"
 import { Request, Response } from "express"
 import bcrypt from "bcrypt"
-import { NewBusinessType } from "../types/business_types"
+import { NewBusinessType, NewUserType } from "../types/business_types"
 import jwt from "jsonwebtoken"
 
 const SALT_ROUND = Number(process.env.SALT_ROUND) || 10
@@ -54,7 +54,7 @@ export class BusinessController {
 				},
 				message: "Business registered successfully"
 			})
-
+			return
 		} catch (error) {
 			console.error("Error registering business: ", error)
 			res.status(500).json({
@@ -144,5 +144,49 @@ export class BusinessController {
 			message: "Logout successfully"
 		})
 		return
+	}
+
+	registerUser = async (req: Request, res: Response) => {
+		try {
+			const result = NewUserRequest.safeParse(req.body)
+
+			if (!result.error) {
+				const error = z.flattenError(result.error)
+
+				res.status(400).json(error)
+			}
+
+			const user = await this.businessModel.getUserByEmail({ email: result.data.email })
+			if (user.rows.length > 0) {
+				res.status(409).json({
+					success: false,
+					error: "Email is already being used",
+				})
+				return
+			}
+
+			const hashedPassword = await bcrypt.hash(result.data.password, SALT_ROUND)
+
+			const businessId = req.session.user.business_id
+			const newUser: NewUserType = { ...result.data, password: hashedPassword }
+
+			const createdUser = await this.businessModel.registerUser({ businessId, newUser })
+			res.status(201).json({
+				success: true,
+				data: {
+					id: createdUser
+				},
+				message: "User registered successfully"
+			})
+			return
+		} catch (error) {
+			console.error("Error creating user: ", error)
+			res.status(500).json({
+				success: false,
+				data: null,
+				error: "Internal server error"
+			})
+			return
+		}
 	}
 }

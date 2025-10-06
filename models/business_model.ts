@@ -1,5 +1,5 @@
 import { Client, ResultSet } from "@libsql/client"
-import { NewBusinessType } from "../types/business_types"
+import { NewBusinessType, NewUserType } from "../types/business_types"
 
 export interface CreatedBusiness {
 	user_id: number,
@@ -65,6 +65,21 @@ export class BusinessModel {
 			throw new Error("Database insert failed")
 		} finally {
 			transaction.close()
+		}
+	}
+
+	registerUser = async ({ businessId, newUser }: { businessId: number, newUser: NewUserType }): Promise<number | null> => {
+		try {
+			const result = await this.db.execute({
+				sql: `INSERT INTO users(business_id, name, email, password, role_id)
+					VALUES (:business_id, :name, :email, :password, :role_id)`,
+				args: { business_id: businessId, ...newUser }
+			})
+
+			return Number(result.lastInsertRowid.valueOf())
+		} catch (error) {
+			console.error("Error creating user: ", error)
+			throw new Error("Error inserting into database")
 		}
 	}
 }

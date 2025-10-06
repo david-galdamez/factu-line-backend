@@ -9,6 +9,7 @@ export const businessRouter = Router()
 const businessModel = new BusinessModel(db)
 const businessController = new BusinessController(businessModel)
 
-businessRouter.post('/register', businessController.register)
+businessRouter.post('/register/business', businessController.register)
 businessRouter.post('/login', businessController.logIn)
 businessRouter.post('/logout', verifyCookie, businessController.logOut)
+businessRouter.post('/register/user', businessController.registerUser)
