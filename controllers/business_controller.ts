@@ -154,6 +154,7 @@ export class BusinessController {
 				const error = z.flattenError(result.error)
 
 				res.status(400).json(error)
+				return
 			}
 
 			const user = await this.businessModel.getUserByEmail({ email: result.data.email })
