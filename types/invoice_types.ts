@@ -4,7 +4,7 @@ import { InvoiceRequest } from "../schemas/invoice";
 export type NewInvoiceType = z.infer<typeof InvoiceRequest>
 
 //PDF TYPES
-interface InvoiceItems {
+export interface InvoiceItems {
     description: string
     quantity: number
     unitPrice: number

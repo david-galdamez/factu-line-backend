@@ -15,37 +15,63 @@ export async function generateInvoicePDF(invoice: InvoiceData): Promise<Buffer> 
         y,
         size: 20,
         font,
-        color: rgb(0,0,0),
+        color: rgb(0, 0, 0),
     })
     y -= 40
 
-    page.drawText(`Factura No. ${invoice.invoiceNumber}`, {x: 50, y, size: fontSize, font})
+    page.drawText(`Factura No. ${invoice.invoiceNumber}`, { x: 50, y, size: fontSize, font })
     y -= 20
-    page.drawText(`Fecha: ${invoice.date}`, {x: 50, y, size: fontSize, font })
+    page.drawText(`Fecha: ${invoice.date}`, { x: 50, y, size: fontSize, font })
     y -= 20
-    page.drawText(`Cliente: ${invoice.customerName}`, {x: 50, y, size: fontSize, font })
+    page.drawText(`Cliente: ${invoice.customerName}`, { x: 50, y, size: fontSize, font })
     y -= 40
 
-    invoice.items.forEach((item) => {
-        const text = `${item.description} - Cant: ${item.quantity} - Precio: $${item.unitPrice.toFixed(2)} - Total: $${(item.quantity * item.unitPrice).toFixed(2)}`
-        page.drawText(text, {x: 50, y, size: fontSize, font})
-        y -= 20
-    })
+    page.drawText("Descripción", { x: 50, y, size: fontSize, font });
+    page.drawText("Cant.", { x: 250, y, size: fontSize, font });
+    page.drawText("Precio", { x: 320, y, size: fontSize, font });
+    page.drawText("Total", { x: 420, y, size: fontSize, font });
+    y -= 15;
 
-    const total = invoice.items.reduce(
-        (sum, i) => sum + i.quantity * i.unitPrice,
-        0
-    )
+    page.drawLine({
+        start: { x: 50, y },
+        end: { x: 500, y },
+        thickness: 1,
+        color: rgb(0.8, 0.8, 0.8),
+    });
 
-    y -= 40
-    page.drawText(`Total: $${total.toFixed(2)}`, {
-        x:width,
+    y -= 20;
+
+    // Items
+    for (const item of invoice.items) {
+        const totalItem = item.quantity * item.unitPrice;
+
+        page.drawText(item.description, { x: 50, y, size: fontSize, font });
+        page.drawText(item.quantity.toString(), { x: 260, y, size: fontSize, font });
+        page.drawText(`$${item.unitPrice.toFixed(2)}`, { x: 330, y, size: fontSize, font });
+        page.drawText(`$${totalItem.toFixed(2)}`, { x: 430, y, size: fontSize, font });
+        y -= 20;
+    }
+
+    y -= 30;
+
+    // Subtotales y totales
+    page.drawText(`Subtotal:`, { x: 350, y, size: fontSize, font });
+    page.drawText(`$${invoice.subtotal.toFixed(2)}`, { x: 450, y, size: fontSize, font });
+    y -= 20;
+
+    page.drawText(`Impuesto:`, { x: 350, y, size: fontSize, font });
+    page.drawText(`$${invoice.tax.toFixed(2)}`, { x: 450, y, size: fontSize, font });
+    y -= 20;
+
+    page.drawText(`Total:`, { x: 350, y, size: fontSize + 2, font });
+    page.drawText(`$${invoice.total.toFixed(2)}`, {
+        x: 450,
         y,
-        size: 14,
+        size: fontSize + 2,
         font,
-    })
+    });
 
-    const pdfBytes = await pdfDoc.save()
-
-    return Buffer.from(pdfBytes)
+    // Guardar PDF en memoria
+    const pdfBytes = await pdfDoc.save();
+    return Buffer.from(pdfBytes);
 }
