@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendInvoice(
     to: string,
@@ -22,8 +22,8 @@ export async function sendInvoice(
         attachments: [
             {
                 filename: `Factura-${invoiceNumber}.pdf`,
-                content: pdfBuffer.toString("base64")
-            }
-        ]
-    })
+                content: pdfBuffer.toString("base64"),
+            },
+        ],
+    });
 }
