@@ -220,4 +220,11 @@ export class BusinessController {
             return;
         }
     };
+
+    isLoggedIn = async (req: Request, res: Response) => {
+        return res.status(200).json({
+            success: true,
+            message: "User is logged in",
+        });
+    };
 }
