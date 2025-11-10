@@ -1,4 +1,4 @@
-import { Client, Row } from "@libsql/client/.";
+import { Client, ResultSet, Row } from "@libsql/client/.";
 import { NewClientType } from "../types/client_types";
 
 export class ClientModel {
@@ -53,12 +53,31 @@ export class ClientModel {
         }
     };
 
-    getClients = async ({ id }: { id: number }): Promise<Row[] | null> => {
+    getClients = async ({
+        id,
+        email,
+    }: {
+        id: number;
+        email: string;
+    }): Promise<Row[] | null> => {
         try {
-            const result = await this.db.execute({
-                sql: "SELECT id, name, email, dui, address FROM clients WHERE business_id = ?",
-                args: [id],
-            });
+            let result: ResultSet;
+            let query =
+                "SELECT id, name, email, dui, address FROM clients WHERE business_id = ? ";
+
+            if (email) {
+                query += "AND email = ?";
+
+                result = await this.db.execute({
+                    sql: query,
+                    args: [id, email],
+                });
+            } else {
+                result = await this.db.execute({
+                    sql: query,
+                    args: [id],
+                });
+            }
 
             return result.rows;
         } catch (error) {

@@ -77,8 +77,12 @@ export class ClientController {
     getClients = async (req: Request, res: Response) => {
         try {
             const businessId = req.session.user.business_id;
+
+            const email = req.query.email as string;
+
             const clientsRows = await this.clientModel.getClients({
                 id: businessId,
+                email: email,
             });
             res.status(200).json({
                 success: true,
