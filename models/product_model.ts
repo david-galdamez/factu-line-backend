@@ -1,4 +1,4 @@
-import { Client, Row, Transaction } from "@libsql/client/.";
+import { Client, ResultSet, Row, Transaction } from "@libsql/client/.";
 import { NewProductType } from "../types/product_types";
 
 export class ProductModel {
@@ -47,7 +47,7 @@ export class ProductModel {
             return "P-0001";
         }
 
-        const lastNumber = result.rows[0].invoice_number as string;
+        const lastNumber = result.rows[0].product_number as string;
         const lastNumeric = parseInt(lastNumber.split("-")[1]);
         const next = (lastNumeric + 1).toString().padStart(4, "0");
 
@@ -97,14 +97,29 @@ export class ProductModel {
 
     getProducts = async ({
         businessId,
+        name,
     }: {
         businessId: number;
+        name: string;
     }): Promise<Row[] | null> => {
         try {
-            const result = await this.db.execute({
-                sql: "SELECT id, product_number, name, description, unit_price FROM products WHERE business_id = :business_id",
-                args: { business_id: businessId },
-            });
+            let query =
+                "SELECT id, product_number, name, description, unit_price FROM products WHERE business_id = :business_id ";
+            let result: ResultSet;
+
+            if (name) {
+                query += "AND name LIKE :name";
+
+                result = await this.db.execute({
+                    sql: query,
+                    args: { business_id: businessId, name: `%${name}%` },
+                });
+            } else {
+                result = await this.db.execute({
+                    sql: query,
+                    args: { business_id: businessId },
+                });
+            }
 
             return result.rows;
         } catch (error) {

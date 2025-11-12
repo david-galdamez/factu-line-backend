@@ -119,9 +119,11 @@ export class ProductController {
     getProducts = async (req: Request, res: Response) => {
         try {
             const businessId = req.session.user.business_id;
+            const name = req.query.name as string;
 
             const productsRows = await this.productModel.getProducts({
                 businessId,
+                name,
             });
 
             res.status(200).json({
