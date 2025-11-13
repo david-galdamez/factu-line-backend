@@ -14,3 +14,4 @@ businessRouter.post("/login", businessController.logIn);
 businessRouter.post("/logout", verifyCookie, businessController.logOut);
 businessRouter.post("/register/user", businessController.registerUser);
 businessRouter.get("/logged", verifyCookie, businessController.isLoggedIn);
+businessRouter.get("/admin", verifyCookie, businessController.isAdmin);

@@ -227,4 +227,20 @@ export class BusinessController {
             message: "User is logged in",
         });
     };
+
+    isAdmin = async (req: Request, res: Response) => {
+        const user = req.session.user;
+        const roleId = user.role_id;
+
+        if (roleId === 1) {
+            res.status(200).json({
+                is_admin: true,
+            });
+            return;
+        }
+
+        res.status(200).json({
+            is_admin: false,
+        });
+    };
 }
