@@ -73,7 +73,7 @@ export async function generateInvoicePDF(
             font,
         });
         page.drawText(`$${totalItem.toFixed(2)}`, {
-            x: 430,
+            x: 460,
             y,
             size: fontSize,
             font,

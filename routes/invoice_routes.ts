@@ -3,9 +3,9 @@ import { InvoiceModel } from "../models/invoice_model";
 import { db } from "../config/database";
 import { InvoiceController } from "../controllers/invoice_controller";
 
-export const invoiceRouter = Router()
+export const invoiceRouter = Router();
 
-const invoiceModel = new InvoiceModel(db)
-const invoiceController = new InvoiceController(invoiceModel)
+const invoiceModel = new InvoiceModel(db);
+const invoiceController = new InvoiceController(invoiceModel);
 
-invoiceRouter.post("/create", invoiceController.create)
+invoiceRouter.post("/create", invoiceController.create);

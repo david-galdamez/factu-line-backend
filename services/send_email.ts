@@ -1,6 +1,12 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD,
+    },
+});
 
 export async function sendInvoice(
     to: string,
@@ -9,8 +15,8 @@ export async function sendInvoice(
     invoiceNumber: string,
     total: number,
 ) {
-    await resend.emails.send({
-        from: "facturas@empresa.com",
+    await transporter.sendMail({
+        from: process.env.EMAIL_USER,
         to,
         subject: `Factura ${invoiceNumber}`,
         html: `
@@ -22,7 +28,7 @@ export async function sendInvoice(
         attachments: [
             {
                 filename: `Factura-${invoiceNumber}.pdf`,
-                content: pdfBuffer.toString("base64"),
+                content: pdfBuffer,
             },
         ],
     });
