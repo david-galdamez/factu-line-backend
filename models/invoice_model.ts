@@ -140,7 +140,7 @@ export class InvoiceModel {
             const items = await this.db.execute({
                 sql: `SELECT
                 p.product_number AS productNumber,
-  						p.description,
+  						p.name,
   						p.unit_price AS unitPrice,
   						ii.quantity
 					FROM
@@ -155,7 +155,7 @@ export class InvoiceModel {
             const invoiceItems = items.rows.map((row) => {
                 const item: InvoiceItems = {
                     productNumber: row.productNumber as string,
-                    description: row.description as string,
+                    description: row.name as string,
                     unitPrice: row.unitPrice as number,
                     quantity: row.quantity as number,
                 };
