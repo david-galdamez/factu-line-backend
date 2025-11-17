@@ -49,9 +49,6 @@ export class InvoiceModel {
                 const subtotal = productPrice * product.quantity;
                 total += subtotal;
 
-                //taxes
-                total *= 1.1;
-
                 await transaction.execute({
                     sql: `INSERT INTO invoice_items (invoice_id, product_id, quantity, subtotal)
 						VALUES(:invoice_id, :product_id, :quantity, :subtotal)`,
@@ -63,6 +60,10 @@ export class InvoiceModel {
                     },
                 });
             }
+
+            //taxes
+            const taxes = total * 0.1;
+            total += taxes;
 
             await transaction.execute({
                 sql: "UPDATE invoice SET total = :total WHERE id = :invoice_id",
