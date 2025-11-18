@@ -62,4 +62,54 @@ export class InvoiceController {
             });
         }
     };
+
+    getInvoices = async (req: Request, res: Response) => {
+        try {
+            const businessId = req.session.user.business_id;
+
+            const invoicesRows = await this.invoiceModel.getInvoices({
+                businessId,
+            });
+
+            res.status(200).json({
+                success: true,
+                data: {
+                    invoices: invoicesRows,
+                },
+                message: "Invoice fetched correctly",
+            });
+        } catch (err) {
+            console.error("Error getting invoices: ", err);
+            res.status(500).json({
+                success: false,
+                data: null,
+                error: "Internal error server",
+            });
+        }
+    };
+
+    getInvoice = async (req: Request, res: Response) => {
+        try {
+            const invoiceId = Number(req.params.id);
+
+            const invoiceData = await this.invoiceModel.getInvoice({
+                invoiceId,
+            });
+
+            res.status(200).json({
+                success: true,
+                data: {
+                    invoice: invoiceData,
+                },
+                message: "Invoice fetched correctly",
+            });
+        } catch (err) {
+            console.error("Error getting invoice: ", err);
+            res.status(500).json({
+                success: false,
+                data: null,
+                error: "Internal error server",
+            });
+        }
+    };
 }

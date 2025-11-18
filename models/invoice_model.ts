@@ -1,7 +1,9 @@
 import { Client, Transaction } from "@libsql/client/.";
 import {
     InvoiceData,
+    InvoiceInfo,
     InvoiceItems,
+    Items,
     NewInvoiceType,
 } from "../types/invoice_types";
 
@@ -183,6 +185,97 @@ export class InvoiceModel {
             return invoiceData;
         } catch (error) {
             console.error("Error getting invoice info: ", error);
+            throw new Error("Error querying into database");
+        }
+    };
+
+    getInvoices = async ({ businessId }: { businessId: number }) => {
+        try {
+            const result = await this.db.execute({
+                sql: `SELECT
+                  i.id,
+                  i. invoice_number,
+                  c.email
+                FROM invoice i
+                JOIN clients c ON c.id = i.client_id
+                WHERE i.business_id = :businessId`,
+                args: { businessId },
+            });
+
+            return result.rows;
+        } catch (err) {
+            console.error("Error getting invoice data: ", err);
+            throw new Error("Error querying into database");
+        }
+    };
+
+    getInvoice = async ({ invoiceId }: { invoiceId: number }) => {
+        try {
+            const invoiceInfoResult = await this.db.execute({
+                sql: `
+         SELECT
+           i.invoice_number AS invoiceNumber,
+           u.name,
+           c.name AS customerName,
+           c.email,
+           i.issue_date,
+           i.total
+         FROM
+           invoice i
+         JOIN clients c ON c.id = i.client_id
+         JOIN users u ON u.id = i.user_id
+         WHERE i.id = :invoiceId
+         `,
+                args: { invoiceId },
+            });
+
+            const items = await this.db.execute({
+                sql: `
+              SELECT
+                p.product_number,
+                p.name,
+                p.unit_price AS unitPrice,
+                ii.quantity,
+                p.unit_price * ii.quantity AS subTotal
+              FROM
+                invoice_items ii
+                JOIN products p ON p.id = ii.product_id
+              WHERE
+                ii.invoice_id = :invoiceId`,
+                args: { invoiceId },
+            });
+
+            let subTotal = 0;
+            const invoiceItems = items.rows.map((row) => {
+                const item: Items = {
+                    productNumber: row.productNumber as string,
+                    description: row.name as string,
+                    unitPrice: row.unitPrice as number,
+                    quantity: row.quantity as number,
+                    subtotal: row.subTotal as number,
+                };
+
+                subTotal += item.subtotal;
+
+                return item;
+            });
+
+            const invoiceRow = invoiceInfoResult.rows[0];
+            const invoiceData: InvoiceInfo = {
+                invoiceNumber: invoiceRow.invoiceNumber as string,
+                workerName: invoiceRow.name as string,
+                customerName: invoiceRow.customerName as string,
+                customerEmail: invoiceRow.email as string,
+                issueDate: invoiceRow.issue_date as string,
+                items: invoiceItems,
+                subtotal: subTotal,
+                tax: subTotal * 0.1,
+                total: invoiceRow.total as number,
+            };
+
+            return invoiceData;
+        } catch (err) {
+            console.error("Error getting invoice info: ", err);
             throw new Error("Error querying into database");
         }
     };

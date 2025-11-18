@@ -23,3 +23,23 @@ export interface InvoiceData {
     tax: number;
     total: number;
 }
+
+export interface InvoiceInfo {
+    invoiceNumber: string;
+    workerName: string;
+    customerName: string;
+    customerEmail: string;
+    issueDate: string;
+    items: Items[];
+    subtotal: number;
+    tax: number;
+    total: number;
+}
+
+export interface Items {
+    productNumber: string;
+    description: string;
+    quantity: number;
+    unitPrice: number;
+    subtotal: number;
+}
