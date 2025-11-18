@@ -169,7 +169,7 @@ export class BusinessController {
         try {
             const result = NewUserRequest.safeParse(req.body);
 
-            if (!result.error) {
+            if (!result.success) {
                 const error = z.flattenError(result.error);
 
                 res.status(400).json(error);
