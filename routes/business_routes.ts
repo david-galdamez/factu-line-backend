@@ -12,6 +12,11 @@ const businessController = new BusinessController(businessModel);
 businessRouter.post("/register/business", businessController.register);
 businessRouter.post("/login", businessController.logIn);
 businessRouter.post("/logout", verifyCookie, businessController.logOut);
-businessRouter.post("/register/user", businessController.registerUser);
+businessRouter.post(
+    "/user/register",
+    verifyCookie,
+    businessController.registerUser,
+);
+businessRouter.get("/user/info", verifyCookie, businessController.listUsers);
 businessRouter.get("/logged", verifyCookie, businessController.isLoggedIn);
 businessRouter.get("/admin", verifyCookie, businessController.isAdmin);
