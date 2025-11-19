@@ -165,7 +165,7 @@ export class BusinessController {
         return;
     };
 
-   registerUser = async (req: Request, res: Response) => {
+    registerUser = async (req: Request, res: Response) => {
         try {
             const result = NewUserRequest.safeParse(req.body);
 
@@ -245,9 +245,10 @@ export class BusinessController {
 
     listUsers = async (req: Request, res: Response) => {
         try {
+            const email = req.query.email as string;
             const businessId = req.session.user.business_id;
 
-            const users = await this.businessModel.listUsers(businessId);
+            const users = await this.businessModel.listUsers(businessId, email);
             res.status(200).json({
                 success: true,
                 data: {

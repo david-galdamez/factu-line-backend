@@ -17,6 +17,6 @@ businessRouter.post(
     verifyCookie,
     businessController.registerUser,
 );
-businessRouter.get("/user/info", verifyCookie, businessController.listUsers);
+businessRouter.get("/user/list", verifyCookie, businessController.listUsers);
 businessRouter.get("/logged", verifyCookie, businessController.isLoggedIn);
 businessRouter.get("/admin", verifyCookie, businessController.isAdmin);

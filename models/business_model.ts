@@ -99,12 +99,23 @@ export class BusinessModel {
         }
     };
 
-    listUsers = async (businessId: number) => {
+    listUsers = async (businessId: number, email: string) => {
         try {
-            const result = await this.db.execute({
-                sql: `SELECT name, email FROM users WHERE business_id = :business_id`,
-                args: { business_id: businessId },
-            });
+            let result: ResultSet;
+            let query = `SELECT id, name, email, role_id FROM users WHERE business_id = :business_id`;
+
+            if (email) {
+                query += ` AND email = :email`;
+                result = await this.db.execute({
+                    sql: query,
+                    args: { business_id: businessId, email },
+                });
+            } else {
+                result = await this.db.execute({
+                    sql: query,
+                    args: { business_id: businessId },
+                });
+            }
 
             return result.rows;
         } catch (error) {
