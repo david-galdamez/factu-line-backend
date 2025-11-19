@@ -165,11 +165,11 @@ export class BusinessController {
         return;
     };
 
-    registerUser = async (req: Request, res: Response) => {
+   registerUser = async (req: Request, res: Response) => {
         try {
             const result = NewUserRequest.safeParse(req.body);
 
-            if (!result.error) {
+            if (!result.success) {
                 const error = z.flattenError(result.error);
 
                 res.status(400).json(error);
@@ -220,7 +220,6 @@ export class BusinessController {
             return;
         }
     };
-
     isLoggedIn = async (req: Request, res: Response) => {
         return res.status(200).json({
             success: true,
