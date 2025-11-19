@@ -242,4 +242,27 @@ export class BusinessController {
             is_admin: false,
         });
     };
+
+    listUsers = async (req: Request, res: Response) => {
+        try {
+            const businessId = req.session.user.business_id;
+
+            const users = await this.businessModel.listUsers(businessId);
+            res.status(200).json({
+                success: true,
+                data: {
+                    users: users,
+                },
+                message: "Users listed successfully",
+            });
+        } catch (error) {
+            console.error("Error listing users: ", error);
+            res.status(500).json({
+                success: false,
+                data: null,
+                error: "Internal server error",
+            });
+            return;
+        }
+    };
 }

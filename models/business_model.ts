@@ -1,85 +1,115 @@
-import { Client, ResultSet } from "@libsql/client"
-import { NewBusinessType, NewUserType } from "../types/business_types"
+import { Client, ResultSet } from "@libsql/client";
+import { NewBusinessType, NewUserType } from "../types/business_types";
 
 export interface CreatedBusiness {
-	user_id: number,
-	business_id: number
+    user_id: number;
+    business_id: number;
 }
 
 export class BusinessModel {
+    private db: Client;
 
-	private db: Client
+    constructor(db: Client) {
+        this.db = db;
+    }
 
-	constructor(db: Client) {
-		this.db = db
-	}
+    getUserByEmail = async ({
+        email,
+    }: {
+        email: string;
+    }): Promise<ResultSet | null> => {
+        try {
+            const business = await this.db.execute({
+                sql: "SELECT id, business_id, role_id, email, password FROM users WHERE email = ?",
+                args: [email],
+            });
 
-	getUserByEmail = async ({ email }: { email: string }): Promise<ResultSet | null> => {
-		try {
-			const business = await this.db.execute({
-				sql: "SELECT id, business_id, role_id, email, password FROM users WHERE email = ?",
-				args: [email]
-			})
+            return business;
+        } catch (error) {
+            console.error("Error fetching business by email: ", error);
+            throw new Error("Database query failed");
+        }
+    };
 
-			return business
-		} catch (error) {
-			console.error("Error fetching business by email: ", error)
-			throw new Error("Database query failed")
-		}
-	}
-
-	create = async (newBusiness: NewBusinessType): Promise<CreatedBusiness | null> => {
-		const transaction = await this.db.transaction('write')
-		try {
-			const createdBusiness = await transaction.execute({
-				sql: `INSERT INTO businesses(name, tax_id, address, phone)
+    create = async (
+        newBusiness: NewBusinessType,
+    ): Promise<CreatedBusiness | null> => {
+        const transaction = await this.db.transaction("write");
+        try {
+            const createdBusiness = await transaction.execute({
+                sql: `INSERT INTO businesses(name, tax_id, address, phone)
 				VALUES (:name, :tax_id, :address, :phone)`,
-				args: {
-					name: newBusiness.name,
-					tax_id: newBusiness.tax_id,
-					address: newBusiness.address,
-					phone: newBusiness.phone,
-				}
-			})
+                args: {
+                    name: newBusiness.name,
+                    tax_id: newBusiness.tax_id,
+                    address: newBusiness.address,
+                    phone: newBusiness.phone,
+                },
+            });
 
-			const businessId = Number(createdBusiness.lastInsertRowid.valueOf())
+            const businessId = Number(
+                createdBusiness.lastInsertRowid.valueOf(),
+            );
 
-			const createdUser = await transaction.execute({
-				sql: `INSERT INTO users(name, email, password, business_id, role_id)
+            const createdUser = await transaction.execute({
+                sql: `INSERT INTO users(name, email, password, business_id, role_id)
 				VALUES (:name, :email, :password, :business_id, :role_id)`,
-				args: {
-					name: newBusiness.user_name,
-					email: newBusiness.email,
-					password: newBusiness.password,
-					business_id: businessId,
-					role_id: 1
-				}
-			})
+                args: {
+                    name: newBusiness.user_name,
+                    email: newBusiness.email,
+                    password: newBusiness.password,
+                    business_id: businessId,
+                    role_id: 1,
+                },
+            });
 
-			await transaction.commit()
+            await transaction.commit();
 
-			return { user_id: Number(createdUser.lastInsertRowid.valueOf()), business_id: Number(createdBusiness.lastInsertRowid.valueOf()) }
-		} catch (error) {
-			if (transaction) await transaction.rollback()
-			console.error("Error creating business: ", error)
-			throw new Error("Database insert failed")
-		} finally {
-			transaction.close()
-		}
-	}
+            return {
+                user_id: Number(createdUser.lastInsertRowid.valueOf()),
+                business_id: Number(createdBusiness.lastInsertRowid.valueOf()),
+            };
+        } catch (error) {
+            if (transaction) await transaction.rollback();
+            console.error("Error creating business: ", error);
+            throw new Error("Database insert failed");
+        } finally {
+            transaction.close();
+        }
+    };
 
-	registerUser = async ({ businessId, newUser }: { businessId: number, newUser: NewUserType }): Promise<number | null> => {
-		try {
-			const result = await this.db.execute({
-				sql: `INSERT INTO users(business_id, name, email, password, role_id)
+    registerUser = async ({
+        businessId,
+        newUser,
+    }: {
+        businessId: number;
+        newUser: NewUserType;
+    }): Promise<number | null> => {
+        try {
+            const result = await this.db.execute({
+                sql: `INSERT INTO users(business_id, name, email, password, role_id)
 					VALUES (:business_id, :name, :email, :password, :role_id)`,
-				args: { business_id: businessId, ...newUser }
-			})
+                args: { business_id: businessId, ...newUser },
+            });
 
-			return Number(result.lastInsertRowid.valueOf())
-		} catch (error) {
-			console.error("Error creating user: ", error)
-			throw new Error("Error inserting into database")
-		}
-	}
+            return Number(result.lastInsertRowid.valueOf());
+        } catch (error) {
+            console.error("Error creating user: ", error);
+            throw new Error("Error inserting into database");
+        }
+    };
+
+    listUsers = async (businessId: number) => {
+        try {
+            const result = await this.db.execute({
+                sql: `SELECT name, email FROM users WHERE business_id = :business_id`,
+                args: { business_id: businessId },
+            });
+
+            return result.rows;
+        } catch (error) {
+            console.error("Error listing users: ", error);
+            throw new Error("Error querying database");
+        }
+    };
 }
